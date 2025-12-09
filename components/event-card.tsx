@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Clock, MapPin, DollarSign, ChevronDown, ChevronUp, Users, Trash2 } from "lucide-react"
+import { Clock, MapPin, DollarSign, ChevronDown, ChevronUp, Users, Trash2, Pencil } from "lucide-react"
 import type { EventWithAttendees, Guest } from "@/lib/types"
 
 interface EventCardProps {
@@ -16,9 +16,17 @@ interface EventCardProps {
   onToggleAttendance: (eventId: string, guestId: string) => void
   onUpdateCost: (eventId: string, cost: number) => void
   onDeleteEvent: (eventId: string) => void
+  onEditEvent: (event: EventWithAttendees) => void
 }
 
-export function EventCard({ event, guests, onToggleAttendance, onUpdateCost, onDeleteEvent }: EventCardProps) {
+export function EventCard({
+  event,
+  guests,
+  onToggleAttendance,
+  onUpdateCost,
+  onDeleteEvent,
+  onEditEvent,
+}: EventCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const confirmedCount = Object.values(event.attendees).filter(Boolean).length
@@ -117,7 +125,19 @@ export function EventCard({ event, guests, onToggleAttendance, onUpdateCost, onD
               </ScrollArea>
             </div>
 
-            <div className="flex justify-end pt-2 border-t border-border">
+            <div className="flex justify-between pt-2 border-t border-border">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onEditEvent(event)
+                }}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Editar evento
+              </Button>
               <Button
                 variant="ghost"
                 size="sm"

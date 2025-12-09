@@ -1,30 +1,47 @@
 "use client"
 
 import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Calendar, Clock, MapPin, DollarSign } from "lucide-react"
+import type { EventWithAttendees } from "@/lib/types"
 
-interface AddEventDialogProps {
+interface EventDialogProps {
   isOpen: boolean
   onClose: () => void
-  onAddEvent: (event: { title: string; time: string; location: string; totalCost: number }) => void
+  onSave: (event: { title: string; time: string; location: string; totalCost: number }) => void
+  event?: EventWithAttendees | null // If provided, we're editing
 }
 
-export function AddEventDialog({ isOpen, onClose, onAddEvent }: AddEventDialogProps) {
+export function EventDialog({ isOpen, onClose, onSave, event }: EventDialogProps) {
   const [title, setTitle] = useState("")
   const [time, setTime] = useState("")
   const [location, setLocation] = useState("")
   const [totalCost, setTotalCost] = useState("")
 
+  const isEditing = !!event
+
+  useEffect(() => {
+    if (event) {
+      setTitle(event.title)
+      setTime(event.time)
+      setLocation(event.location)
+      setTotalCost(event.total_cost.toString())
+    } else {
+      setTitle("")
+      setTime("")
+      setLocation("")
+      setTotalCost("")
+    }
+  }, [event, isOpen])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (title.trim() && time.trim()) {
-      onAddEvent({
+      onSave({
         title: title.trim(),
         time: time.trim(),
         location: location.trim() || "Por definir",
@@ -48,7 +65,7 @@ export function AddEventDialog({ isOpen, onClose, onAddEvent }: AddEventDialogPr
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">
             <Calendar className="h-5 w-5" />
-            Nuevo Evento
+            {isEditing ? "Editar Evento" : "Nuevo Evento"}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -118,7 +135,7 @@ export function AddEventDialog({ isOpen, onClose, onAddEvent }: AddEventDialogPr
             <Button type="button" variant="outline" onClick={handleClose}>
               Cancelar
             </Button>
-            <Button type="submit">Crear evento</Button>
+            <Button type="submit">{isEditing ? "Guardar cambios" : "Crear evento"}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

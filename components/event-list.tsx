@@ -9,9 +9,17 @@ interface EventListProps {
   onToggleAttendance: (eventId: string, guestId: string) => void
   onUpdateCost: (eventId: string, cost: number) => void
   onDeleteEvent: (eventId: string) => void
+  onEditEvent: (event: EventWithAttendees) => void
 }
 
-export function EventList({ events, guests, onToggleAttendance, onUpdateCost, onDeleteEvent }: EventListProps) {
+export function EventList({
+  events,
+  guests,
+  onToggleAttendance,
+  onUpdateCost,
+  onDeleteEvent,
+  onEditEvent,
+}: EventListProps) {
   if (events.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -31,6 +39,7 @@ export function EventList({ events, guests, onToggleAttendance, onUpdateCost, on
           onToggleAttendance={onToggleAttendance}
           onUpdateCost={onUpdateCost}
           onDeleteEvent={onDeleteEvent}
+          onEditEvent={onEditEvent}
         />
       ))}
     </div>

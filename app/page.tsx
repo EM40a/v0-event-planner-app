@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { Header } from "@/components/header"
 import { EventList } from "@/components/event-list"
 import { GuestDrawer } from "@/components/guest-drawer"
-import { AddEventDialog } from "@/components/add-event-dialog"
+import { EventDialog } from "@/components/event-dialog"
 import { createClient } from "@/lib/supabase/client"
 import type { Event, Guest, EventWithAttendees, EventAttendee } from "@/lib/types"
 
@@ -13,7 +13,8 @@ export default function EventPlanner() {
   const [guests, setGuests] = useState<Guest[]>([])
   const [events, setEvents] = useState<EventWithAttendees[]>([])
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [isAddEventOpen, setIsAddEventOpen] = useState(false)
+  const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
+  const [editingEvent, setEditingEvent] = useState<EventWithAttendees | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   const supabase = createClient()
@@ -59,12 +60,10 @@ export default function EventPlanner() {
     const currentStatus = event.attendees[guestId] ?? false
     const newStatus = !currentStatus
 
-    // Optimistic update
     setEvents((prev) =>
       prev.map((e) => (e.id === eventId ? { ...e, attendees: { ...e.attendees, [guestId]: newStatus } } : e)),
     )
 
-    // Update in database
     await supabase
       .from("event_attendees")
       .update({ is_attending: newStatus })
@@ -85,7 +84,6 @@ export default function EventPlanner() {
 
     setGuests((prev) => [...prev, newGuest])
 
-    // Add new guest to all existing events as not attending
     const attendeeInserts = events.map((event) => ({
       event_id: event.id,
       guest_id: newGuest.id,
@@ -136,7 +134,6 @@ export default function EventPlanner() {
 
     if (error || !newEvent) return
 
-    // Add all guests as attendees (not attending by default)
     const attendeeInserts = guests.map((guest) => ({
       event_id: newEvent.id,
       guest_id: guest.id,
@@ -153,6 +150,54 @@ export default function EventPlanner() {
     })
 
     setEvents((prev) => [...prev, { ...newEvent, attendees: attendeesMap }])
+  }
+
+  const editEvent = async (eventData: { title: string; time: string; location: string; totalCost: number }) => {
+    if (!editingEvent) return
+
+    setEvents((prev) =>
+      prev.map((e) =>
+        e.id === editingEvent.id
+          ? {
+              ...e,
+              title: eventData.title,
+              time: eventData.time,
+              location: eventData.location,
+              total_cost: eventData.totalCost,
+            }
+          : e,
+      ),
+    )
+
+    await supabase
+      .from("events")
+      .update({
+        title: eventData.title,
+        time: eventData.time,
+        location: eventData.location,
+        total_cost: eventData.totalCost,
+      })
+      .eq("id", editingEvent.id)
+
+    setEditingEvent(null)
+  }
+
+  const handleSaveEvent = (eventData: { title: string; time: string; location: string; totalCost: number }) => {
+    if (editingEvent) {
+      editEvent(eventData)
+    } else {
+      addEvent(eventData)
+    }
+  }
+
+  const handleEditEvent = (event: EventWithAttendees) => {
+    setEditingEvent(event)
+    setIsEventDialogOpen(true)
+  }
+
+  const handleCloseEventDialog = () => {
+    setIsEventDialogOpen(false)
+    setEditingEvent(null)
   }
 
   const deleteEvent = async (eventId: string) => {
@@ -175,7 +220,7 @@ export default function EventPlanner() {
         isDarkMode={isDarkMode}
         onToggleTheme={() => setIsDarkMode(!isDarkMode)}
         onOpenGuestDrawer={() => setIsDrawerOpen(true)}
-        onOpenAddEvent={() => setIsAddEventOpen(true)}
+        onOpenAddEvent={() => setIsEventDialogOpen(true)}
       />
       <main className="container mx-auto px-4 py-6 max-w-2xl">
         <EventList
@@ -184,6 +229,7 @@ export default function EventPlanner() {
           onToggleAttendance={toggleAttendance}
           onUpdateCost={updateEventCost}
           onDeleteEvent={deleteEvent}
+          onEditEvent={handleEditEvent}
         />
       </main>
       <GuestDrawer
@@ -194,7 +240,12 @@ export default function EventPlanner() {
         onEditGuest={editGuest}
         onDeleteGuest={deleteGuest}
       />
-      <AddEventDialog isOpen={isAddEventOpen} onClose={() => setIsAddEventOpen(false)} onAddEvent={addEvent} />
+      <EventDialog
+        isOpen={isEventDialogOpen}
+        onClose={handleCloseEventDialog}
+        onSave={handleSaveEvent}
+        event={editingEvent}
+      />
     </div>
   )
 }
