@@ -69,7 +69,7 @@ export function GuestDrawer({ isOpen, onClose, guests, onAddGuest, onEditGuest, 
           </SheetTitle>
         </SheetHeader>
 
-        <div className="flex flex-col h-[calc(100vh-8rem)]">
+        <div className="flex flex-col h-[calc(100vh-8rem)] px-4">
           <div className="py-4">
             <div className="flex gap-2">
               <Input

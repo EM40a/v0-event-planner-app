@@ -24,7 +24,7 @@ export function Header({ isDarkMode, onToggleTheme, onOpenGuestDrawer, onOpenAdd
               variant="ghost"
               size="icon"
               onClick={onOpenAddEvent}
-              className="h-10 w-10"
+              className="h-10 w-10 cursor-pointer"
               aria-label="Agregar evento"
             >
               <Plus className="h-5 w-5" />
@@ -33,7 +33,7 @@ export function Header({ isDarkMode, onToggleTheme, onOpenGuestDrawer, onOpenAdd
               variant="ghost"
               size="icon"
               onClick={onOpenGuestDrawer}
-              className="h-10 w-10"
+              className="h-10 w-10 cursor-pointer"
               aria-label="Administrar invitados"
             >
               <Users className="h-5 w-5" />
@@ -42,7 +42,7 @@ export function Header({ isDarkMode, onToggleTheme, onOpenGuestDrawer, onOpenAdd
               variant="ghost"
               size="icon"
               onClick={onToggleTheme}
-              className="h-10 w-10"
+              className="h-10 w-10 cursor-pointer"
               aria-label={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
             >
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
