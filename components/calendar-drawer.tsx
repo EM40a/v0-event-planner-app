@@ -109,7 +109,7 @@ export function CalendarDrawer({ isOpen, onClose, events }: CalendarDrawerProps)
             Calendario de Eventos
           </SheetTitle>
         </SheetHeader>
-        <ScrollArea className="h-[calc(100vh-8rem)] mt-4">
+        <ScrollArea className="mt-4 px-4">
           {groupedEvents.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
               <Calendar className="h-12 w-12 mb-4 opacity-50" />

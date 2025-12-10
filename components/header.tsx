@@ -18,7 +18,7 @@ export function Header({ isDarkMode, onToggleTheme, onOpenGuestDrawer, onOpenAdd
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-2">
             <Calendar className="h-6 w-6 text-foreground" />
-            <h1 className="text-xl font-bold tracking-tight text-foreground">Eventos Amigos</h1>
+            <h1 className="text-xl font-bold tracking-tight text-foreground">Eventos</h1>
           </div>
           <div className="flex items-center gap-2">
             <Button
