@@ -5,6 +5,7 @@ import { Header } from "@/components/header"
 import { EventList } from "@/components/event-list"
 import { GuestDrawer } from "@/components/guest-drawer"
 import { EventDialog } from "@/components/event-dialog"
+import { CalendarDrawer } from "@/components/calendar-drawer"
 import { createClient } from "@/lib/supabase/client"
 import type { Event, Guest, EventWithAttendees, EventAttendee } from "@/lib/types"
 
@@ -14,6 +15,7 @@ export default function EventPlanner() {
   const [events, setEvents] = useState<EventWithAttendees[]>([])
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [isEventDialogOpen, setIsEventDialogOpen] = useState(false)
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<EventWithAttendees | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -24,7 +26,7 @@ export default function EventPlanner() {
 
     const [guestsRes, eventsRes, attendeesRes] = await Promise.all([
       supabase.from("guests").select("*").order("created_at", { ascending: true }),
-      supabase.from("events").select("*").order("created_at", { ascending: true }),
+      supabase.from("events").select("*").order("event_date", { ascending: true }),
       supabase.from("event_attendees").select("*"),
     ])
 
@@ -120,11 +122,18 @@ export default function EventPlanner() {
     await supabase.from("guests").delete().eq("id", id)
   }
 
-  const addEvent = async (eventData: { title: string; time: string; location: string; totalCost: number }) => {
+  const addEvent = async (eventData: {
+    title: string
+    eventDate: string
+    time: string
+    location: string
+    totalCost: number
+  }) => {
     const { data: newEvent, error } = await supabase
       .from("events")
       .insert({
         title: eventData.title,
+        event_date: eventData.eventDate,
         time: eventData.time,
         location: eventData.location,
         total_cost: eventData.totalCost,
@@ -152,7 +161,13 @@ export default function EventPlanner() {
     setEvents((prev) => [...prev, { ...newEvent, attendees: attendeesMap }])
   }
 
-  const editEvent = async (eventData: { title: string; time: string; location: string; totalCost: number }) => {
+  const editEvent = async (eventData: {
+    title: string
+    eventDate: string
+    time: string
+    location: string
+    totalCost: number
+  }) => {
     if (!editingEvent) return
 
     setEvents((prev) =>
@@ -161,6 +176,7 @@ export default function EventPlanner() {
           ? {
               ...e,
               title: eventData.title,
+              event_date: eventData.eventDate,
               time: eventData.time,
               location: eventData.location,
               total_cost: eventData.totalCost,
@@ -173,6 +189,7 @@ export default function EventPlanner() {
       .from("events")
       .update({
         title: eventData.title,
+        event_date: eventData.eventDate,
         time: eventData.time,
         location: eventData.location,
         total_cost: eventData.totalCost,
@@ -182,7 +199,13 @@ export default function EventPlanner() {
     setEditingEvent(null)
   }
 
-  const handleSaveEvent = (eventData: { title: string; time: string; location: string; totalCost: number }) => {
+  const handleSaveEvent = (eventData: {
+    title: string
+    eventDate: string
+    time: string
+    location: string
+    totalCost: number
+  }) => {
     if (editingEvent) {
       editEvent(eventData)
     } else {
@@ -221,6 +244,7 @@ export default function EventPlanner() {
         onToggleTheme={() => setIsDarkMode(!isDarkMode)}
         onOpenGuestDrawer={() => setIsDrawerOpen(true)}
         onOpenAddEvent={() => setIsEventDialogOpen(true)}
+        onOpenCalendar={() => setIsCalendarOpen(true)}
       />
       <main className="container mx-auto px-4 py-6 max-w-2xl">
         <EventList
@@ -246,6 +270,7 @@ export default function EventPlanner() {
         onSave={handleSaveEvent}
         event={editingEvent}
       />
+      <CalendarDrawer isOpen={isCalendarOpen} onClose={() => setIsCalendarOpen(false)} events={events} />
     </div>
   )
 }

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Clock, MapPin, DollarSign, ChevronDown, ChevronUp, Users, Trash2, Pencil } from "lucide-react"
+import { Clock, MapPin, DollarSign, ChevronDown, ChevronUp, Users, Trash2, Pencil, CalendarDays } from "lucide-react"
 import type { EventWithAttendees, Guest } from "@/lib/types"
 
 interface EventCardProps {
@@ -33,6 +33,16 @@ export function EventCard({
   const totalCount = guests.length
   const costPerPerson = confirmedCount > 0 ? Math.ceil(event.total_cost / confirmedCount) : 0
 
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return ""
+    const date = new Date(dateStr + "T00:00:00")
+    return date.toLocaleDateString("es-ES", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    })
+  }
+
   return (
     <Card className="overflow-hidden transition-all duration-200 bg-card border-border">
       <CardHeader className="cursor-pointer p-4 pb-3" onClick={() => setIsExpanded(!isExpanded)}>
@@ -46,6 +56,10 @@ export function EventCard({
               </Badge>
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <CalendarDays className="h-4 w-4" />
+                <span className="font-medium text-foreground capitalize">{formatDate(event.event_date)}</span>
+              </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="h-4 w-4" />
                 <span className="font-medium text-foreground">{event.time}</span>

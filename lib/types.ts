@@ -7,6 +7,7 @@ export interface Guest {
 export interface Event {
   id: string
   title: string
+  event_date: string
   time: string
   location: string
   total_cost: number

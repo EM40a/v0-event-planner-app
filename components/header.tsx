@@ -1,16 +1,17 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Sun, Moon, Users, Plus, Calendar } from "lucide-react"
+import { Sun, Moon, Users, Plus, Calendar, CalendarDays } from "lucide-react"
 
 interface HeaderProps {
   isDarkMode: boolean
   onToggleTheme: () => void
   onOpenGuestDrawer: () => void
   onOpenAddEvent: () => void
+  onOpenCalendar: () => void
 }
 
-export function Header({ isDarkMode, onToggleTheme, onOpenGuestDrawer, onOpenAddEvent }: HeaderProps) {
+export function Header({ isDarkMode, onToggleTheme, onOpenGuestDrawer, onOpenAddEvent, onOpenCalendar }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 max-w-2xl">
@@ -28,6 +29,15 @@ export function Header({ isDarkMode, onToggleTheme, onOpenGuestDrawer, onOpenAdd
               aria-label="Agregar evento"
             >
               <Plus className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onOpenCalendar}
+              className="h-10 w-10 cursor-pointer"
+              aria-label="Ver calendario"
+            >
+              <CalendarDays className="h-5 w-5" />
             </Button>
             <Button
               variant="ghost"

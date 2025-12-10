@@ -61,7 +61,7 @@ export function GuestDrawer({ isOpen, onClose, guests, onAddGuest, onEditGuest, 
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="right" className="w-full sm:max-w-md bg-background border-border">
+      <SheetContent side="right" className="w-full sm:max-w-md bg-background border-border overflow-y-auto">
         <SheetHeader className="pb-4 border-b border-border">
           <SheetTitle className="flex items-center gap-2 text-foreground">
             <Users className="h-5 w-5" />
@@ -69,7 +69,7 @@ export function GuestDrawer({ isOpen, onClose, guests, onAddGuest, onEditGuest, 
           </SheetTitle>
         </SheetHeader>
 
-        <div className="flex flex-col h-[calc(100vh-8rem)] px-4">
+        <div className="flex flex-col px-4">
           <div className="py-4">
             <div className="flex gap-2">
               <Input

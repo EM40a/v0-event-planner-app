@@ -6,18 +6,19 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Calendar, Clock, MapPin, DollarSign } from "lucide-react"
+import { Calendar, Clock, MapPin, DollarSign, CalendarDays } from "lucide-react"
 import type { EventWithAttendees } from "@/lib/types"
 
 interface EventDialogProps {
   isOpen: boolean
   onClose: () => void
-  onSave: (event: { title: string; time: string; location: string; totalCost: number }) => void
-  event?: EventWithAttendees | null // If provided, we're editing
+  onSave: (event: { title: string; eventDate: string; time: string; location: string; totalCost: number }) => void
+  event?: EventWithAttendees | null
 }
 
 export function EventDialog({ isOpen, onClose, onSave, event }: EventDialogProps) {
   const [title, setTitle] = useState("")
+  const [eventDate, setEventDate] = useState("")
   const [time, setTime] = useState("")
   const [location, setLocation] = useState("")
   const [totalCost, setTotalCost] = useState("")
@@ -27,11 +28,13 @@ export function EventDialog({ isOpen, onClose, onSave, event }: EventDialogProps
   useEffect(() => {
     if (event) {
       setTitle(event.title)
+      setEventDate(event.event_date || "")
       setTime(event.time)
       setLocation(event.location)
       setTotalCost(event.total_cost.toString())
     } else {
       setTitle("")
+      setEventDate(new Date().toISOString().split("T")[0])
       setTime("")
       setLocation("")
       setTotalCost("")
@@ -40,9 +43,10 @@ export function EventDialog({ isOpen, onClose, onSave, event }: EventDialogProps
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (title.trim() && time.trim()) {
+    if (title.trim() && eventDate && time.trim()) {
       onSave({
         title: title.trim(),
+        eventDate,
         time: time.trim(),
         location: location.trim() || "Por definir",
         totalCost: Number(totalCost) || 0,
@@ -53,6 +57,7 @@ export function EventDialog({ isOpen, onClose, onSave, event }: EventDialogProps
 
   const handleClose = () => {
     setTitle("")
+    setEventDate("")
     setTime("")
     setLocation("")
     setTotalCost("")
@@ -82,6 +87,22 @@ export function EventDialog({ isOpen, onClose, onSave, event }: EventDialogProps
                 className="bg-input border-border"
                 required
               />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="eventDate" className="text-foreground">
+                Fecha
+              </Label>
+              <div className="relative">
+                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="eventDate"
+                  type="date"
+                  value={eventDate}
+                  onChange={(e) => setEventDate(e.target.value)}
+                  className="pl-9 bg-input border-border"
+                  required
+                />
+              </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="time" className="text-foreground">
