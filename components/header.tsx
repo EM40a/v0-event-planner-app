@@ -1,7 +1,9 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
-import { Sun, Moon, Users, Plus, Calendar, CalendarDays } from "lucide-react"
+import { Sun, Moon, Users, Plus, CalendarDays, LogOut, Calendar } from "lucide-react"
 
 interface HeaderProps {
   isDarkMode: boolean
@@ -12,6 +14,15 @@ interface HeaderProps {
 }
 
 export function Header({ isDarkMode, onToggleTheme, onOpenGuestDrawer, onOpenAddEvent, onOpenCalendar }: HeaderProps) {
+  const router = useRouter()
+  const supabase = createClient()
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push("/auth")
+    router.refresh()
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 max-w-2xl">
@@ -56,6 +67,15 @@ export function Header({ isDarkMode, onToggleTheme, onOpenGuestDrawer, onOpenAdd
               aria-label={isDarkMode ? "Cambiar a modo claro" : "Cambiar a modo oscuro"}
             >
               {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              className="h-10 w-10 cursor-pointer text-red-500 hover:text-red-400 hover:bg-red-500/10"
+              aria-label="Cerrar sesión"
+            >
+              <LogOut className="h-5 w-5" />
             </Button>
           </div>
         </div>

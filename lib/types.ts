@@ -1,6 +1,7 @@
 export interface Guest {
   id: string
   name: string
+  user_id: string
   created_at?: string
 }
 
@@ -11,6 +12,7 @@ export interface Event {
   time: string
   location: string
   total_cost: number
+  user_id: string
   created_at?: string
 }
 

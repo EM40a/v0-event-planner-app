@@ -18,10 +18,23 @@ export default function EventPlanner() {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<EventWithAttendees | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const supabase = createClient()
 
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      setUserId(user?.id ?? null)
+    }
+    getUser()
+  }, [supabase])
+
   const fetchData = useCallback(async () => {
+    if (!userId) return
+
     setIsLoading(true)
 
     const [guestsRes, eventsRes, attendeesRes] = await Promise.all([
@@ -45,7 +58,7 @@ export default function EventPlanner() {
     }
 
     setIsLoading(false)
-  }, [supabase])
+  }, [supabase, userId])
 
   useEffect(() => {
     fetchData()
@@ -80,7 +93,9 @@ export default function EventPlanner() {
   }
 
   const addGuest = async (name: string) => {
-    const { data: newGuest, error } = await supabase.from("guests").insert({ name }).select().single()
+    if (!userId) return
+
+    const { data: newGuest, error } = await supabase.from("guests").insert({ name, user_id: userId }).select().single()
 
     if (error || !newGuest) return
 
@@ -129,6 +144,8 @@ export default function EventPlanner() {
     location: string
     totalCost: number
   }) => {
+    if (!userId) return
+
     const { data: newEvent, error } = await supabase
       .from("events")
       .insert({
@@ -137,6 +154,7 @@ export default function EventPlanner() {
         time: eventData.time,
         location: eventData.location,
         total_cost: eventData.totalCost,
+        user_id: userId,
       })
       .select()
       .single()
